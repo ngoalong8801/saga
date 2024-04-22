@@ -9,4 +9,5 @@ import lombok.Setter;
 public class Product {
     String name;
     int price;
+    int threshold;
 }

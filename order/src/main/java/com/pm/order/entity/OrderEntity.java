@@ -13,7 +13,7 @@ import java.util.Map;
 @Getter
 @Setter
 public class OrderEntity {
-    public static final String TABLE_NAME= "order";
+    public static final String TABLE_NAME= "ordertb";
     @Id
     @GeneratedValue
     private Integer id;

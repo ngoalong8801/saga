@@ -12,11 +12,12 @@ import lombok.Setter;
 @Getter
 @Setter
 public class ProductEntity {
-    public static final String TABLE_NAME= "order";
+    public static final String TABLE_NAME= "product";
     @Id
     @GeneratedValue
     private Integer id;
 
     private String name;
     private int threshold;
+    private int price;
 }

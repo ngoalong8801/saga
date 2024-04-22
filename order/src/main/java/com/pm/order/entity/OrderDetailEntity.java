@@ -7,6 +7,7 @@ import lombok.Setter;
 @Getter
 @Setter
 @Entity
+@Table(name = OrderDetailEntity.TABLE_NAME)
 public class OrderDetailEntity {
     public static final String TABLE_NAME= "order_detail";
     @Id
@@ -14,7 +15,7 @@ public class OrderDetailEntity {
     private Integer id;
 
     @ManyToOne
-    @JoinColumn(name = "order_id")
+    @JoinColumn(name = "ordertb_id")
     private OrderEntity order;
 
     @ManyToOne
