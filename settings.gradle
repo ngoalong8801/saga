@@ -1,0 +1,5 @@
+rootProject.name = 'saga'
+
+include 'common'
+include 'account'
+include 'order'
