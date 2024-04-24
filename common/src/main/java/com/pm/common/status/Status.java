@@ -1,6 +1,12 @@
 package com.pm.common.status;
 
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.Getter;
+
+@Data
+@AllArgsConstructor
 public class Status {
-    int code;
-    Message message;
+    Code code;
+    Name name;
 }

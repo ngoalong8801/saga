@@ -8,8 +8,6 @@ import com.pm.common.utils.Utils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import static com.pm.common.status.Message.SUCCESS;
-
 @Service
 public class AccountService {
     @Autowired

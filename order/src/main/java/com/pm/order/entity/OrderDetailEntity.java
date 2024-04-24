@@ -26,6 +26,7 @@ public class OrderDetailEntity {
 
     private int quantity;  // Quantity of the product
 
+
     // Constructors, Getters, and Setters
     public OrderDetailEntity() {}
 

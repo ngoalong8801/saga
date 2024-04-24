@@ -1,5 +1,8 @@
 package com.pm.order.controller;
 
+import com.pm.common.dto.request.OrderRequest;
+import com.pm.common.dto.response.Order;
+import com.pm.common.dto.response.Response;
 import com.pm.order.service.OrderService;
 //import com.pm.common.dto.Account;
 //import com.pm.common.dto.response.Response;
@@ -15,4 +18,8 @@ import org.springframework.web.bind.annotation.ResponseBody;
 public class OrderController {
     @Autowired
     OrderService orderService;
+    @PostMapping("/create")
+    public @ResponseBody Response<Order> createOrder(@RequestBody OrderRequest request) {
+        return orderService.createOrder(request);
+    }
 }

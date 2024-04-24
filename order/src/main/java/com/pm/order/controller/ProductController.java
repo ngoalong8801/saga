@@ -15,8 +15,11 @@ import java.util.List;
 @Controller
 @RequestMapping(path = "/product")
 public class ProductController {
-    @Autowired
     ProductService productService;
+    @Autowired
+    ProductController(ProductService productService) {
+        this.productService = productService;
+    }
 
     @PostMapping(path = "/addBulk")
     public @ResponseBody Response<Product> addProducts(@RequestBody List<Product> products) {

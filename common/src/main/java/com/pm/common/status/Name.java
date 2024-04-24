@@ -1,5 +1,5 @@
 package com.pm.common.status;
 
-public enum Message {
+public enum Name {
     SUCCESS, FAILED, ROLL_BACKED, PENDING;
 }

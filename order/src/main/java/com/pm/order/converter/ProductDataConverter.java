@@ -15,7 +15,5 @@ public class ProductDataConverter extends AbstractConverter<Product, ProductEnti
     }
 
     @Override
-    public ProductEntity createFromClass() {
-        return new ProductEntity();
-    }
+    public ProductEntity createFromClass() { return new ProductEntity(); }
 }

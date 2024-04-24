@@ -1,5 +1,6 @@
 package com.pm.order.entity;
 
+import com.pm.common.constant.OrderStatus;
 import com.pm.common.dto.Product;
 import jakarta.persistence.*;
 import lombok.Getter;
@@ -18,6 +19,14 @@ public class OrderEntity {
     @GeneratedValue
     private Integer id;
 
+    private String userEmail;
+
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<OrderDetailEntity> orderDetails;
+
+    int totalPrice;
+
+    @Column(columnDefinition = "ENUM('NEW', 'CONFIRMED', 'SHIPPED', 'DELIVERED', 'CANCELED', 'PENDING', 'FAILED')")
+    @Enumerated(EnumType.STRING)
+    private OrderStatus status;
 }

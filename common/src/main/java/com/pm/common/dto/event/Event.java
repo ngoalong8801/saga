@@ -1,6 +1,5 @@
 package com.pm.common.dto.event;
 
-import com.pm.common.status.Message;
 import com.pm.common.status.Status;
 import lombok.AllArgsConstructor;
 import lombok.Data;
