@@ -9,5 +9,6 @@ public class Order {
     int id;
     int total;
     OrderStatus status;
+    String userEmail;
     List<OrderDetail> orderDetails;
 }

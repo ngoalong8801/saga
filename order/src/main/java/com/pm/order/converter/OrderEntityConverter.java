@@ -14,6 +14,7 @@ public class OrderEntityConverter extends AbstractConverter<OrderEntity, Order> 
     public void populate(OrderEntity orderEntity, Order order) {
         order.setId(orderEntity.getId());
         order.setTotal(orderEntity.getTotalPrice());
+        order.setUserEmail(orderEntity.getUserEmail());
         order.setOrderDetails(orderDetailEntityConverter.convertAll(orderEntity.getOrderDetails()));
         order.setStatus(orderEntity.getStatus());
     }

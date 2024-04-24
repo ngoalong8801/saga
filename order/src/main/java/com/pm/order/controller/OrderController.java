@@ -13,13 +13,15 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import java.lang.reflect.InvocationTargetException;
+
 @Controller
 @RequestMapping(path = "/order")
 public class OrderController {
     @Autowired
     OrderService orderService;
     @PostMapping("/create")
-    public @ResponseBody Response<Order> createOrder(@RequestBody OrderRequest request) {
+    public @ResponseBody Response<Order> createOrder(@RequestBody OrderRequest request) throws InvocationTargetException, NoSuchMethodException, InstantiationException, IllegalAccessException {
         return orderService.createOrder(request);
     }
 }
