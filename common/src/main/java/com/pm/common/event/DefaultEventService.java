@@ -15,6 +15,6 @@ public class DefaultEventService implements EventService {
     private KafkaTemplate<String, Object> kafkaTemplate;
     @Override
     public <T extends Record> void publishEvent(Event<T> event) {
-        kafkaTemplate.send(event.getType(), event);
+        kafkaTemplate.send(event.getEventType().name(), event);
     }
 }

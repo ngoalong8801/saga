@@ -2,25 +2,20 @@ package com.pm.order.service;
 
 //import com.pm.common.dto.response.Response;
 //import com.pm.common.utils.Utils;
+import com.pm.common.constant.EventType;
 import com.pm.common.constant.OrderStatus;
-import com.pm.common.converters.Populators;
 import com.pm.common.dto.event.Event;
-import com.pm.common.dto.event.OrderCreatedEvent;
 import com.pm.common.dto.event.OrderRecord;
-import com.pm.common.dto.event.Record;
 import com.pm.common.dto.request.OrderRequest;
 import com.pm.common.dto.response.Order;
 import com.pm.common.dto.response.Response;
 import com.pm.common.event.EventService;
-import com.pm.common.utils.EventUtils;
 import com.pm.common.utils.Utils;
 import com.pm.order.converter.MapProductQuantityConverter;
-import com.pm.order.converter.OrderData2OrderRecordConverter;
-import com.pm.order.converter.OrderDetailEntityConverter;
+import com.pm.order.converter.OrderEntity2OrderRecordConverter;
 import com.pm.order.converter.OrderEntityConverter;
-import com.pm.order.entity.OrderDetailEntity;
+import com.pm.order.converter.OrderRequest2OrderRecordConverter;
 import com.pm.order.entity.OrderEntity;
-import com.pm.order.entity.ProductEntity;
 import com.pm.order.populator.OrderDetailPopulator;
 import com.pm.order.repository.OrderRepository;
 import com.pm.order.repository.ProductRepository;
@@ -28,10 +23,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.lang.reflect.InvocationTargetException;
-import java.util.*;
-import java.util.stream.Collectors;
-
-import static com.pm.order.constant.Constant.DEFAULT_USER_EMAIL_FOR_TESTING;
 
 
 @Service
@@ -60,47 +51,64 @@ public class OrderService {
     EventService eventService;
 
     @Autowired
-    OrderData2OrderRecordConverter orderData2OrderRecordConverter;
+    OrderEntity2OrderRecordConverter orderEntity2OrderRecordConverter;
+    @Autowired
+    OrderRequest2OrderRecordConverter orderRequest2OrderRecordConverter;
 
-    public Response<Order> createOrder(OrderRequest request) throws InvocationTargetException, NoSuchMethodException, InstantiationException, IllegalAccessException {
-        OrderEntity order = new OrderEntity();
-        order.setStatus(OrderStatus.PENDING);
-        processCreatingOrder(request, order);
-        Order orderData = orderEntityConverter.convert(order);
-        OrderRecord record = orderData2OrderRecordConverter.convert(orderData);
-        EventUtils.publishEvent(record, OrderCreatedEvent.class, eventService);
+    public Response<Order> createOrder(OrderRequest request)  {
+        OrderEntity entity = initOrder(request);
+        Order orderData = orderEntityConverter.convert(entity);
+        publishOrderCreatedEvent(request, entity);
         return orderUtils.generateSuccessResponse(orderData);
     }
 
-     public void processCreatingOrder(OrderRequest request, OrderEntity order) {
-        try {
-            productService.deductQuantityOfProduct(request.getProductQuantities());
-            List<OrderDetailEntity> orderDetailEntities = getOrderDetails(request);
-            populateOrderData(order, orderDetailEntities);
-
-        } catch (Exception e) {
-            order.setStatus(OrderStatus.FAILED);
-            throw e;
-        }
-        finally {
-            orderRepository.save(order);
-        }
+    private void publishOrderCreatedEvent(OrderRequest request, OrderEntity entity) {
+        OrderRecord record = orderEntity2OrderRecordConverter.convert(entity);
+        record = orderRequest2OrderRecordConverter.convert(request, record);
+        Event<OrderRecord> orderCreatedEvent = new Event.Builder<OrderRecord>()
+                .record(record)
+                .eventType(EventType.ORDER_CREATED_EVENT)
+                .build();
+        eventService.publishEvent(orderCreatedEvent);
     }
 
-    public List<OrderDetailEntity> getOrderDetails(OrderRequest request) {
-        Map<Integer, ProductEntity> products = productService.findProductByIds(request).stream().collect(Collectors.toMap(product -> product.getId(), product -> product));
-        Map<ProductEntity, Integer> productQuantities = request.getProductQuantities().entrySet().stream().collect(Collectors.toMap(
-                entry -> products.get(entry.getKey()),
-                Map.Entry::getValue
-        ));
-        return mapProductQuantityConverter.convertAll(productQuantities.entrySet());
+    private OrderEntity initOrder(OrderRequest request) {
+        OrderEntity entity = new OrderEntity();
+        entity.setUserEmail(request.getCustomerEmail());
+        entity.setStatus(OrderStatus.PENDING);
+        orderRepository.save(entity);
+        return entity;
     }
 
-    private void populateOrderData(OrderEntity order, List<OrderDetailEntity> orderDetailEntities) {
-        order.setUserEmail(DEFAULT_USER_EMAIL_FOR_TESTING);
-        order.setOrderDetails(orderDetailEntities);
-        Populators.populateAll(order, orderDetailEntities, orderDetailPopulator);
-        int total = orderDetailEntities.stream().reduce(0, (subtotal, entry) -> subtotal + entry.getCurPrice() * entry.getQuantity(), Integer::sum);
-        order.setTotalPrice(total);
-    }
+//     public void processCreatingOrder(OrderRequest request, OrderEntity order) {
+//        try {
+//            productService.deductQuantityOfProduct(request);
+//            List<OrderDetailEntity> orderDetailEntities = getOrderDetails(request);
+//            populateOrderData(order, orderDetailEntities);
+//
+//        } catch (Exception e) {
+//            order.setStatus(OrderStatus.FAILED);
+//            throw e;
+//        }
+//        finally {
+//            orderRepository.save(order);
+//        }
+//    }
+
+//    public List<OrderDetailEntity> getOrderDetails(OrderRequest request) {
+//        Map<Integer, ProductEntity> products = productService.findProductByIds(request).stream().collect(Collectors.toMap(ProductEntity::getId, product -> product));
+//        Map<ProductEntity, Integer> productQuantities = request.getItems().stream().collect(Collectors.toMap(
+//                entry -> products.get(entry.getId()),
+//                ProductQRequest::getQuantity
+//        ));
+//        return mapProductQuantityConverter.convertAll(productQuantities.entrySet());
+//    }
+//
+//    private void populateOrderData(OrderEntity order, List<OrderDetailEntity> orderDetailEntities) {
+//        order.setUserEmail(DEFAULT_USER_EMAIL_FOR_TESTING);
+//        order.setOrderDetails(orderDetailEntities);
+//        Populators.populateAll(order, orderDetailEntities, orderDetailPopulator);
+//        int total = orderDetailEntities.stream().reduce(0, (subtotal, entry) -> subtotal + entry.getCurPrice() * entry.getQuantity(), Integer::sum);
+//        order.setTotalPrice(total);
+//    }
 }

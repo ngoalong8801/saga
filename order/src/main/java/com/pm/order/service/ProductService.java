@@ -2,6 +2,7 @@ package com.pm.order.service;
 
 import com.pm.common.dto.Product;
 import com.pm.common.dto.request.OrderRequest;
+import com.pm.common.dto.request.ProductQRequest;
 import com.pm.common.dto.response.Response;
 import com.pm.common.utils.Utils;
 import com.pm.order.constant.Constant;
@@ -35,10 +36,10 @@ public class ProductService {
     }
 
     @Transactional
-    public void deductQuantityOfProduct(Map<Integer, Integer> productQuantities) {
-        for (Map.Entry<Integer, Integer> entry : productQuantities.entrySet()) {
-            Integer productId = entry.getKey();
-            Integer quantityToDeduct = entry.getValue();
+    public void deductQuantityOfProduct(OrderRequest request) {
+        for (var productQ : request.getItems()) {
+            Integer productId = productQ.getId();
+            int quantityToDeduct = productQ.getQuantity();
 
             ProductEntity product = productRepository.findById(productId).orElseThrow(
                     () -> new ProductNotFoundException(String.valueOf(productId))
@@ -54,7 +55,7 @@ public class ProductService {
     }
 
     public List<ProductEntity> findProductByIds(OrderRequest request) {
-        Set<Integer> productIds = request.getProductQuantities().keySet();
+        Set<Integer> productIds = request.getItems().stream().map(ProductQRequest::getId).collect(Collectors.toSet());
         List<ProductEntity> products = productRepository.findAllById(productIds);
         Set<Integer> foundIds = products.stream().map(ProductEntity::getId).collect(Collectors.toSet());
         productIds.forEach(id -> {

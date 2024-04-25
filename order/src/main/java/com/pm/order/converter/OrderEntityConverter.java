@@ -10,12 +10,11 @@ import org.springframework.stereotype.Service;
 public class OrderEntityConverter extends AbstractConverter<OrderEntity, Order> {
     @Autowired
     OrderDetailEntityConverter orderDetailEntityConverter;
+
     @Override
     public void populate(OrderEntity orderEntity, Order order) {
         order.setId(orderEntity.getId());
-        order.setTotal(orderEntity.getTotalPrice());
-        order.setUserEmail(orderEntity.getUserEmail());
-        order.setOrderDetails(orderDetailEntityConverter.convertAll(orderEntity.getOrderDetails()));
+        order.setMessage("Your order is being processed.");
         order.setStatus(orderEntity.getStatus());
     }
 
