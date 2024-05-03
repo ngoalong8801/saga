@@ -1,16 +1,17 @@
-package com.pm.order.service;
+package com.pm.inventory.service;
 
 import com.pm.common.dto.Product;
+import com.pm.common.dto.event.OrderRecord;
+import com.pm.common.dto.event.ProductRecord;
 import com.pm.common.dto.request.OrderRequest;
-import com.pm.common.dto.request.ProductQRequest;
 import com.pm.common.dto.response.Response;
 import com.pm.common.utils.Utils;
-import com.pm.order.constant.Constant;
-import com.pm.order.converter.ProductDataConverter;
-import com.pm.order.entity.ProductEntity;
-import com.pm.order.exception.ProductNotFoundException;
-import com.pm.order.exception.ProductExceedThresholdException;
-import com.pm.order.repository.ProductRepository;
+import com.pm.inventory.constant.Constant;
+import com.pm.inventory.converter.ProductDataConverter;
+import com.pm.inventory.entity.ProductEntity;
+import com.pm.inventory.exception.ProductNotFoundException;
+import com.pm.inventory.exception.ProductExceedThresholdException;
+import com.pm.inventory.repository.ProductRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -36,10 +37,11 @@ public class ProductService {
     }
 
     @Transactional
-    public void deductQuantityOfProduct(OrderRequest request) {
-        for (var productQ : request.getItems()) {
-            Integer productId = productQ.getId();
-            int quantityToDeduct = productQ.getQuantity();
+    public void deductQuantityOfProduct(OrderRecord record) {
+        List<ProductRecord> productRecords = record.getItems();
+        for (var productRecord : productRecords) {
+            Integer productId = productRecord.getId();
+            Integer quantityToDeduct = productRecord.getQuantity();
 
             ProductEntity product = productRepository.findById(productId).orElseThrow(
                     () -> new ProductNotFoundException(String.valueOf(productId))
@@ -54,8 +56,8 @@ public class ProductService {
         }
     }
 
-    public List<ProductEntity> findProductByIds(OrderRequest request) {
-        Set<Integer> productIds = request.getItems().stream().map(ProductQRequest::getId).collect(Collectors.toSet());
+    public List<ProductEntity> findProductByIds(OrderRecord orderRecord) {
+        Set<Integer> productIds = orderRecord.getItems().stream().map(ProductRecord::getId).collect(Collectors.toSet());
         List<ProductEntity> products = productRepository.findAllById(productIds);
         Set<Integer> foundIds = products.stream().map(ProductEntity::getId).collect(Collectors.toSet());
         productIds.forEach(id -> {

@@ -4,12 +4,14 @@ package com.pm.order.service;
 //import com.pm.common.utils.Utils;
 import com.pm.common.constant.EventType;
 import com.pm.common.constant.OrderStatus;
+import com.pm.common.converters.Converter;
 import com.pm.common.dto.event.Event;
 import com.pm.common.dto.event.OrderRecord;
 import com.pm.common.dto.request.OrderRequest;
 import com.pm.common.dto.response.Order;
 import com.pm.common.dto.response.Response;
 import com.pm.common.event.EventService;
+import com.pm.common.model.OrderR;
 import com.pm.common.utils.Utils;
 import com.pm.order.converter.MapProductQuantityConverter;
 import com.pm.order.converter.OrderEntity2OrderRecordConverter;
@@ -19,10 +21,9 @@ import com.pm.order.entity.OrderEntity;
 import com.pm.order.populator.OrderDetailPopulator;
 import com.pm.order.repository.OrderRepository;
 import com.pm.order.repository.ProductRepository;
+import com.pm.common.repository.OrderRRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
-import java.lang.reflect.InvocationTargetException;
 
 
 @Service
@@ -43,8 +44,6 @@ public class OrderService {
     Utils<Order> orderUtils;
 
     @Autowired
-    ProductService productService;
-    @Autowired
     OrderDetailPopulator orderDetailPopulator;
 
     @Autowired
@@ -55,11 +54,23 @@ public class OrderService {
     @Autowired
     OrderRequest2OrderRecordConverter orderRequest2OrderRecordConverter;
 
+    @Autowired
+    OrderRRepository orderRRepository;
+
+    @Autowired
+    Converter<OrderEntity, OrderR> orderEntity2OrderRConverter;
+
     public Response<Order> createOrder(OrderRequest request)  {
         OrderEntity entity = initOrder(request);
         Order orderData = orderEntityConverter.convert(entity);
+        createOrderForRead(entity);
         publishOrderCreatedEvent(request, entity);
         return orderUtils.generateSuccessResponse(orderData);
+    }
+
+    private void createOrderForRead(OrderEntity entity) {
+        OrderR orderR = orderEntity2OrderRConverter.convert(entity);
+        orderRRepository.save(orderR);
     }
 
     private void publishOrderCreatedEvent(OrderRequest request, OrderEntity entity) {

@@ -25,4 +25,21 @@ public interface Converter<SOURCE, TARGET> extends org.springframework.core.conv
             return result;
         }
     }
+
+    default List<TARGET> convertAll(Collection<? extends SOURCE> sources, Collection<? extends TARGET> targets) throws ConversionException {
+        if (CollectionUtils.isEmpty(sources)) {
+            return Collections.emptyList();
+        } else {
+            List<TARGET> result = new ArrayList<>(sources.size());
+            Iterator<? extends SOURCE> var3 = sources.iterator();
+            Iterator<? extends TARGET> var4 = targets.iterator();
+            while(var3.hasNext() && var4.hasNext()) {
+                SOURCE source =  var3.next();
+                TARGET target = var4.next();
+                result.add(this.convert(source, target));
+            }
+
+            return result;
+        }
+    }
 }

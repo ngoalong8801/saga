@@ -1,4 +1,4 @@
-package com.pm.order.converter;
+package com.pm.common.converters.cassandra;
 
 import com.pm.common.converters.AbstractConverter;
 import com.pm.common.dto.event.OrderRecord;

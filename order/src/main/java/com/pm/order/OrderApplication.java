@@ -9,7 +9,7 @@ import org.springframework.data.cassandra.repository.config.EnableCassandraRepos
 
 @SpringBootApplication(scanBasePackages = {"com.pm.common", "com.pm.order", "com.pm.common.model"})
 @EnableCassandraRepositories(
-		basePackages = "com.pm.order.repository.cassandra")
+		basePackages = "com.pm.common.repository")
 @EntityScan(basePackages = {"com.pm.common.model", "com.pm.order.entity"})
 public class OrderApplication {
 	public static void main(String[] args) {

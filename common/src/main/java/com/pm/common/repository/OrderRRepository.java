@@ -1,4 +1,4 @@
-package com.pm.order.repository.cassandra;
+package com.pm.common.repository;
 
 import com.pm.common.model.OrderR;
 import org.springframework.data.cassandra.repository.CassandraRepository;

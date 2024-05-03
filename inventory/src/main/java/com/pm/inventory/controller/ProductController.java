@@ -1,8 +1,8 @@
-package com.pm.order.controller;
+package com.pm.inventory.controller;
 
 import com.pm.common.dto.Product;
 import com.pm.common.dto.response.Response;
-import com.pm.order.service.ProductService;
+import com.pm.inventory.service.ProductService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PostMapping;
